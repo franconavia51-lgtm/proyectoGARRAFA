@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
  password_hash text NOT NULL, email text NOT NULL UNIQUE,
  created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS app_seed_state (
+ name text PRIMARY KEY, completed_at timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS user_roles (
  user_id bigint REFERENCES users(id) ON DELETE CASCADE,
  role_id bigint REFERENCES roles(id) ON DELETE CASCADE, PRIMARY KEY(user_id,role_id)
