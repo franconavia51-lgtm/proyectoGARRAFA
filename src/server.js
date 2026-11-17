@@ -9,11 +9,13 @@ const { Pool } = require('pg');
 const swaggerUi = require('swagger-ui-express');
 
 const app = express();
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost', port: Number(process.env.DB_PORT || 5432),
-  database: process.env.DB_NAME || 'garrafaya', user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD, max: 15, idleTimeoutMillis: 30000
-});
+const pool = new Pool(process.env.DATABASE_URL
+  ? { connectionString: process.env.DATABASE_URL, max: 15, idleTimeoutMillis: 30000 }
+  : {
+      host: process.env.DB_HOST || 'localhost', port: Number(process.env.DB_PORT || 5432),
+      database: process.env.DB_NAME || 'garrafaya', user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD, max: 15, idleTimeoutMillis: 30000
+    });
 app.use(helmet());
 app.use(cors({origin: process.env.CORS_ORIGIN || '*'}));
 app.use(express.json({limit:'1mb'}));
@@ -295,8 +297,8 @@ app.get('/api/v1/:resource/:id',asyncHandler(async(req,res)=>{
  if(!q.rowCount) return res.status(404).json({message:'Registro no encontrado'});
  const row=q.rows[0]; if(cfg.hidden) cfg.hidden.forEach(k=>delete row[k]); res.json(row);
 }));
-app.post('/api/v1/:resource',asyncHandler(async(req,res)=>{
- const cfg=resourceMap[req.params.resource]; if(!cfg) return res.status(404).json({message:'Recurso no disponible'});
+app.post('/api/v1/:resource',asyncHandler(async(req,res,next)=>{
+ const cfg=resourceMap[req.params.resource]; if(!cfg) return next();
  if(['users','access_logs','audit_logs','inventory','inventory_movements'].includes(cfg.table)) return res.status(403).json({message:'Utiliza el endpoint específico'});
  const entries=Object.entries(req.body||{});
  if(!entries.length) return res.status(400).json({message:'Envía al menos un campo'});

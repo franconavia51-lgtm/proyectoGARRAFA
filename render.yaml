@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: garrafaya-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm run db:migrate && npm start
+    initialDeployHook: npm run seed
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: garrafaya-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: "*"
+
+databases:
+  - name: garrafaya-db
+    databaseName: garrafaya
+    user: garrafaya
+    plan: free

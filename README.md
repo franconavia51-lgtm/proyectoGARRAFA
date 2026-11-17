@@ -53,6 +53,18 @@ Swagger interactivo: `http://localhost/api-docs/`
 
 En Swagger, abre `POST /api/v1/auth/login`, envía el login y la contraseña de administrador, copia el campo `token` de la respuesta y pulsa **Authorize**. Pega solo el token; Swagger agrega automáticamente `Bearer` al llamar a los endpoints protegidos. El archivo OpenAPI también está disponible en `http://localhost/api-docs.json`.
 
+## 3.1 Publicar en Render
+
+El archivo `render.yaml` configura la API y una base de datos PostgreSQL. Para obtener una URL HTTPS pública que funcione desde PC y teléfono:
+
+1. Sube este proyecto a un repositorio de GitHub y crea una cuenta en Render.
+2. En Render, crea un **Blueprint** y conecta ese repositorio. Render leerá `render.yaml` y creará la API y la base de datos.
+3. Espera a que termine el primer despliegue. Render aplicará `sql/schema.sql` y creará el usuario administrador automáticamente.
+4. En **Environment**, consulta el valor generado de `ADMIN_PASSWORD`. El login es `admin@garrafaya.bo` (o `admin`) y esa contraseña generada.
+5. Abre la URL `https://...onrender.com` que aparece en el servicio. Para Swagger agrega `/api-docs/`; para comprobar la conexión usa `/api/v1/health`. Esa misma URL sirve desde el teléfono.
+
+El plan gratuito puede tener límites, suspensión por inactividad o restricciones de persistencia/tiempo para PostgreSQL; revisa las condiciones actuales de Render antes de usarlo con datos importantes. No uses credenciales de prueba en producción.
+
 ## 4. Autenticación
 `POST /api/v1/auth/login`
 ```json
